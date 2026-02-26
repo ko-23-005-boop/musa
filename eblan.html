@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Онлайн чат Firebase</title>
+<style>
+body { font-family: Arial; background: #f0f0f0; margin: 0; }
+#chat { max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px; height: 400px; overflow-y: scroll; }
+#messageForm { display: flex; max-width: 600px; margin: 0 auto; }
+#messageInput { flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+button { padding: 10px; margin-left: 5px; border-radius: 5px; background: #0d6efd; color: white; border: none; cursor: pointer; }
+.message { margin: 5px 0; padding: 5px 10px; border-radius: 5px; }
+.message.you { background: #0d6efd; color: white; text-align: right; }
+.message.friend { background: #e9ecef; text-align: left; }
+</style>
+</head>
+<body>
+
+<div id="chat"></div>
+<form id="messageForm">
+  <input id="messageInput" autocomplete="off" placeholder="Введите сообщение..." />
+  <button>Отправить</button>
+</form>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+// === Вставь сюда свои настройки Firebase ===
+const firebaseConfig = {
+  apiKey: "AIzaSyBe17S62LqPHGbInCBIHOjf097CQLuSJDg",
+  authDomain: "musa-e696f.firebaseapp.com",
+  projectId: "musa-e696f",
+  storageBucket: "musa-e696f.firebasestorage.app",
+  messagingSenderId: "1087702029171",
+  appId: "1:1087702029171:web:b0b0884a342590f46aab06",
+  measurementId: "G-FQCTS9KY6B"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const messagesRef = db.ref("messages");
+
+const chat = document.getElementById("chat");
+const form = document.getElementById("messageForm");
+const input = document.getElementById("messageInput");
+
+// Отправка сообщения
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  if(input.value.trim() !== "") {
+    messagesRef.push({ text: input.value });
+    input.value = "";
+  }
+});
+
+// Получение новых сообщений
+messagesRef.on("child_added", snapshot => {
+  const msg = snapshot.val().text;
+  addMessage(msg, "friend");
+});
+
+function addMessage(msg, type){
+  const div = document.createElement("div");
+  div.textContent = msg;
+  div.className = "message " + type;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
+
+</body>
+</html>
